@@ -85,12 +85,26 @@ var handle = function(argv) {
     process.stdout.write(send_buffer);
   } else if (argv.out == "recv") {
     process.stdout.write(recv_buffer);
+  } else if (argv.out == "host_port") {
+    var connected_line_chunk = info_chunks.find(function(chunk) {
+        return chunk.header.indexOf('Connected to') > -1;
+    });
+    if (connected_line_chunk) {
+        var match = connected_line_chunk.header.match(/Connected to (\S+).*port ([0-9]+)/);
+        if (match && match.length >= 3) {
+            process.stdout.write(`${match[1]} ${match[2]}`);
+        } else {
+            // ?
+        }
+    } else {
+        // ?
+    }
   }
 };
 
 const argv = require("yargs")
   .describe("out", "specify output format")
-  .choices("out", ["send", "recv"])
+  .choices("out", ["send", "recv", "host_port"])
   .default("out", "send")
   .command("*", "parse trace file", {}, handle)
   .help().argv;
