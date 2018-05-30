@@ -1,11 +1,17 @@
 var fs = require("fs");
 
 var handle = function(argv) {
-  var trace_lines = fs
-    .readFileSync(argv._[0])
-    .toString()
-    .replace(/\r\n/g, "\n")
-    .split("\n");
+  var trace_lines;
+  try {
+    trace_lines = fs
+      .readFileSync(argv._[0])
+      .toString()
+      .replace(/\r\n/g, "\n")
+      .split("\n");
+  } catch (e) {
+    console.log(`Could not open '${argv._[0]}': ${e}`);
+    process.exit(1);
+  }
 
   // parse chunks of trace into separate data structures
   var info_chunks = [];
@@ -83,8 +89,8 @@ var handle = function(argv) {
 };
 
 const argv = require("yargs")
-.describe('out', 'specify output format')
-.choices('out', ['send', 'recv'])
-.default('out', 'send')
+  .describe("out", "specify output format")
+  .choices("out", ["send", "recv"])
+  .default("out", "send")
   .command("*", "parse trace file", {}, handle)
   .help().argv;
